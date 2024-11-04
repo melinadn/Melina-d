@@ -1,0 +1,63 @@
+
+
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WetterApp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Wetterabfrage</h1>
+        <div class="mb-3">
+            <label for="city-input" class="form-label">Stadt eingeben</label>
+            <input type="text" class="form-control" id="city-input" placeholder="Stadt eingeben">
+        </div>
+        <button class="btn btn-primary w-100" onclick="fetchWeather()">Wetter abrufen</button>
+        <div id="weather-output" class="alert alert-info mt-3" style="display: none;"></div>
+    </div>
+    <script>
+        function fetchWeather() {
+            const city = document.getElementById('city-input').value;
+            const apiKey = 'bab281d79e5f1e9755a68d754cc313e7';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=de`;
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Stadt nicht gefunden oder Fehler beim Abrufen der Daten.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    document.getElementById('weather-output').innerHTML = `<p>Fehler: ${error.message}</p>`;
+                    document.getElementById('weather-output').style.display = 'block';
+                });
+        }
+        function displayWeather(data) {
+            const weatherOutput = document.getElementById('weather-output');
+            if (data && data.weather && data.main) {
+                weatherOutput.innerHTML = `
+                    <h2>Wetter in ${data.name}</h2>
+                    <p>Temperatur: ${data.main.temp} °C</p>
+                    <p>Beschreibung: ${data.weather[0].description}</p>
+                    <p>Min/Max: ${data.main.temp_min}°C / ${data.main.temp_max}°C</p>
+                `;
+                weatherOutput.classList.remove('alert-danger');
+                weatherOutput.classList.add('alert-info');
+                weatherOutput.style.display = 'block';
+            } else {
+                weatherOutput.innerHTML = `<p>Stadt nicht gefunden.</p>`;
+                weatherOutput.classList.remove('alert-info');
+                weatherOutput.classList.add('alert-danger');
+                weatherOutput.style.display = 'block';
+            }
+        }
+    </script>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6Z9m8uMBM0lqJ8RU8ftPpONC8rOf77mP6u1L9H2n6p6ejVgqWw5" crossorigin="anonymous"></script>
+</body>
+</html>
